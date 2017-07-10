@@ -31,7 +31,7 @@ def sim_distance(prefs, person1, person2):
     :param person2: 第二人名字
     :return: 欧式距离
     """
-    si = []
+    si = {}
     for item in prefs[person1]:
         if item in prefs[person2]:
             si[item] = 1
@@ -43,7 +43,7 @@ def sim_distance(prefs, person1, person2):
     sum_of_square = sum([pow(prefs[person1][item] - prefs[person2][item], 2)
                          for item in si])
 
-    return 1/(1 + sqrt(sum_of_square))
+    return 1 / (1 + sqrt(sum_of_square))
 
 
 def sim_pearson(prefs, person1, person2):
@@ -54,7 +54,7 @@ def sim_pearson(prefs, person1, person2):
     :param person2: 第二人名字
     :return: 皮尔逊相关度
     """
-    si = []
+    si = {}
     for item in prefs[person1]:
         if item in prefs[person2]:
             si[item] = 1
@@ -72,7 +72,15 @@ def sim_pearson(prefs, person1, person2):
     pSum = sum([prefs[person1][it] * prefs[person2][it] for it in si])
 
     num = pSum - (sum1 * sum2 / n)
-    den = sqrt((sum1Sq - pow(sum1, 2 / n)) * (sum2Sq - pow(sum2, 2) / n))
+    den = sqrt((sum1Sq - pow(sum1, 2) / n) * (sum2Sq - pow(sum2, 2) / n))
     if den == 0:
         return 0
     return num / den
+
+
+if __name__ == "__main__":
+    # 测试欧式距离用例
+    print sim_distance(critics, "Lisa Rose", "Gene Seymour")
+
+    # 测试皮尔逊相关度用例
+    print sim_pearson(critics, "Lisa Rose", "Gene Seymour")
