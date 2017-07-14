@@ -99,6 +99,42 @@ def sim_jaccard(prefs, person1, person2):
     return n / (len(person1) + len(person2) - n)
 
 
+def top_matches(prefs, person, n=5, similarity=sim_pearson):
+    score = [(similarity(prefs, person, other), other) for other in prefs if other != person]
+
+    score.sort()
+    score.reverse()
+    return score[0:n]
+
+
+def get_recommendations(prefs, person, similarity = sim_pearson):
+    totals = {}
+    sim_sum = {}
+
+    for other in prefs:
+        if other == person:
+            continue
+
+        sim = similarity(prefs, person, other)
+
+        # 只保留正数评价
+        if sim <= 0:
+            continue
+
+        for item in prefs[other]:
+            if item not in prefs[person] or prefs[person][item] == 0:
+                totals.setdefault(item, 0)
+                totals[item] += prefs[other][item] * sim
+                sim_sum.setdefault(item, 0)
+                sim_sum[item] += sim
+
+        rankings = [(total / sim_sum[item], item) for item, total in totals.items()]
+
+        rankings.sort()
+        rankings.reverse()
+        return rankings
+
+
 if __name__ == "__main__":
     # 测试欧式距离用例
     print sim_distance(critics, "Lisa Rose", "Gene Seymour")
@@ -108,3 +144,9 @@ if __name__ == "__main__":
 
     # 测试Jaccard系数
     print sim_jaccard(critics, "Lisa Rose", "Gene Seymour")
+
+    # 最佳匹配测试
+    print top_matches(critics, 'Toby', n=10)
+
+    # 测试推荐系统
+    print get_recommendations(critics, 'Toby')
